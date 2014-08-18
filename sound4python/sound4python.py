@@ -16,6 +16,7 @@ class Sound4Python(object):
         self.FNULL = open(os.devnull,'w')
         self.playing = False
         self.sec = 0
+        self.speedMultiplier = 1
         
     def launchWithoutConsole(self, args,output=False):
         """Launches args windowless and waits until finished"""
@@ -100,6 +101,10 @@ class Sound4Python(object):
             self.waveWrite.close()
             return None
 
+    def changePlaybackSpeed(self, speedMultiplier):
+        self.speedMultiplier = speedMultiplier
+        self.seek(self.seekSec)
+
     def seek(self, sec):
         sr = self.wav[0]
         self.sec = sec
@@ -110,9 +115,9 @@ class Sound4Python(object):
         self.seekSec = sec
 
         if len(self.wav[1].shape) == 1:
-            self.createMemfile(self.wav[1][idx:], self.wav[0])
+            self.createMemfile(self.wav[1][idx:], self.wav[0] * self.speedMultiplier)
         else:
-            self.createMemfile(self.wav[1][idx:,0], self.wav[0])
+            self.createMemfile(self.wav[1][idx:,0], self.wav[0] * self.speedMultiplier)
         
         
     def loadWav(self, wavPath=None):

@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "sound4python",
-    version = "0.1.2",
+    version = "0.1.3",
     author = "Peter Rennert, dave.crist@gmail.com",
     author_email = "p.rennert@cs.ucl.ac.uk, dave.crist@gmail.com",
     description = ("comfortable playback of wav files"),
