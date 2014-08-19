@@ -15,7 +15,6 @@ class Sound4Python(object):
         self.seekSec = 0
         self.FNULL = open(os.devnull,'w')
         self.playing = False
-        self.sec = 0
         self.speedMultiplier = 1
         
     def launchWithoutConsole(self, args,output=False):
@@ -107,7 +106,6 @@ class Sound4Python(object):
 
     def seek(self, sec):
         sr = self.wav[0]
-        self.sec = sec
         idx = np.floor(sec * sr)
         if idx > self.wav[1].shape[0]:
             raise ValueError("tried to seek outside of wav length")
@@ -131,7 +129,6 @@ class Sound4Python(object):
         else:
             self.createMemfile(self.wav[1][:,0], self.wav[0])
 
-        self.sec = 0
 
         
         
@@ -161,8 +158,9 @@ class Sound4Python(object):
     def pause(self):
         self.stopTime = dt.datetime.now()
         self.terminateProcess()
-        secDiff = (self.stopTime - self.startTime).total_seconds()
-        self.seek(self.sec + secDiff)
+        secDiff = (self.stopTime - self.startTime).total_seconds() \
+                    * self.speedMultiplier
+        self.seek(self.seekSec + secDiff)
         self.playing = False
         
         
