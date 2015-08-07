@@ -16,6 +16,7 @@ class Sound4Python(object):
         self.FNULL = open(os.devnull,'w')
         self.playing = False
         self.speedMultiplier = 1
+        self.lock = threading.Lock()
         
     def launchWithoutConsole(self, args,output=False):
         """Launches args windowless and waits until finished"""
@@ -136,7 +137,9 @@ class Sound4Python(object):
         if self.playing:
             return
 
+        self.lock.acquire()
         self.playing = True
+        self.lock.release()
         self.wt = Sound4PythonThread(self)
         self.wt.Run()        
         
@@ -151,17 +154,21 @@ class Sound4Python(object):
         
         
     def stop(self):
+        self.lock.acquire()
         self.terminateProcess()
         self.seek(0)
         self.playing = False
+        self.lock.release()
         
     def pause(self):
         self.stopTime = dt.datetime.now()
+        self.lock.acquire()
         self.terminateProcess()
+        self.playing = False
+        self.lock.release()
         secDiff = (self.stopTime - self.startTime).total_seconds() \
                     * self.speedMultiplier
         self.seek(self.seekSec + secDiff)
-        self.playing = False
         
         
 class Sound4PythonThread(threading.Thread):    
@@ -171,6 +178,9 @@ class Sound4PythonThread(threading.Thread):
     
     def run(self):
         self.parent._play()
+        self.parent.lock.acquire()
+        self.parent.playing = False
+        self.parent.lock.release()
 
     def Run(self):
         self.start()
